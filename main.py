@@ -1,23 +1,45 @@
-"""Entry point for the news-image-20261119 poster.
+"""Write the finished poster to /output/entry.png.
 
-Draws the Thursday 19 November 2026 world-news poster deterministically
-and writes it to /output/entry.png, or to the path given as argv[1].
+The poster image is stored as base64 text in the three companion
+modules (img_part1, img_part2, img_part3) next to this file. This
+program only joins and decodes that data, so it needs nothing but
+the Python standard library: no image library, no network, no clock.
 """
 
 import sys
 from pathlib import Path
 
-from build_image import build
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import base64
+import os
+
+from img_part1 import DATA as _PART1
+from img_part2 import DATA as _PART2
+from img_part3 import DATA as _PART3
 
 
 def main() -> int:
-    target = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/output/entry.png")
     try:
-        out = build(str(target))
-    except Exception as exc:  # any draw failure is reported, not hidden
-        print(f"error: could not draw poster: {exc}", file=sys.stderr)
+        png = base64.b64decode(_PART1 + _PART2 + _PART3, validate=True)
+    except Exception as exc:
+        print(f"error: cannot decode poster data: {exc}", file=sys.stderr)
         return 1
-    print(f"wrote {out} ({out.stat().st_size} bytes)")
+
+    if len(sys.argv) > 1:
+        target = Path(sys.argv[1])
+    else:
+        out_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
+        target = out_dir / "entry.png"
+
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(png)
+    except OSError as exc:
+        print(f"error: cannot write {target}: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"wrote {target} ({len(png)} bytes)")
     return 0
 
 

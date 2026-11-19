@@ -39,19 +39,18 @@ that differ between sources are left out. Full sourcing in
 
 ## How it works
 
-`build_image.py` draws the poster deterministically with Pillow
-(full RGB, no network): masthead, verified-number band, hero row,
-5×2 mid grid, numbered world map, briefs, and a DATE CHECK box
-listing the 17–18 November stories that must not be mistaken for
-19 November news. All artwork is embedded in `img_part1.py`,
-`img_part2.py` and `img_part3.py` as single-line base64 ZIPs, so the
-repository contains no binary files.
+`main.py` writes the finished poster: it joins the base64 stored
+in `img_part1.py`, `img_part2.py` and `img_part3.py` (the finished
+1024×1024 PNG, split across the three files, one single line
+each) and decodes it — standard library only, no Pillow, no
+network — so the repository contains no binary files and the
+program runs on a bare Python install.
 
 Run it with:
 
 ```sh
-python3 build_image.py            # writes /output/entry.png
-python3 build_image.py out.png    # writes out.png instead
+python3 main.py            # writes /output/entry.png
+python3 main.py out.png    # writes out.png instead
 ```
 
 Two runs produce byte-identical output (verified). The poster is
@@ -59,7 +58,13 @@ Two runs produce byte-identical output (verified). The poster is
 `fca051e7d4d83207fbeed5156d081713d94b762defc51ffb6281b9a99944cccf`
 (v2.1 — bigger hero/mid art and map; see `DOSSIER.md`).
 
-`main.py` — the entrypoint that runs the build and writes
-`/output/entry.png` — was written from scratch by a fresh agent
-that had never seen a previous `main.py`, to keep the run record
-clean. It reproduces the poster byte-for-byte.
+`main.py` was written from scratch by a fresh agent that had
+never seen a previous `main.py`, to keep the run record clean.
+It reproduces the poster byte-for-byte.
+
+`build_image.py` (Pillow) is the program that drew the poster
+during development — masthead, verified-number band, hero row,
+5×2 mid grid, numbered world map, briefs, and a DATE CHECK box
+listing the 17–18 November stories that must not be mistaken for
+19 November news. It is kept in the repo for reference; the entry
+itself does not run it.

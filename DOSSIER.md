@@ -5,6 +5,40 @@ Entry for make.fun bounty
 a program that writes one image summing up the world's news of
 Thursday, 19 November 2026, to `/output/entry.png`.
 
+## v2.1 fix — the entry program now decodes, never draws (run_completes)
+
+The v2.1 entry was rejected by the site: `run_completes` failed
+with exit code 1. Cause: the old `main.py` imported `build_image`,
+which needs Pillow, but the judging server only provides the
+Python standard library — and `python3 -P` does not put the
+script's own folder on `sys.path`, so the companion imports
+would have failed even with Pillow present.
+
+Fix (this session, fresh agent that never saw the old `main.py`):
+
+- `main.py` rewritten from scratch, standard library only
+  (`base64`, `os`, `sys`, `pathlib`). It first inserts its own
+  folder at the front of `sys.path` (from `__file__`), then
+  imports `DATA` from `img_part1/2/3`, joins and base64-decodes
+  it, and writes `/output/entry.png` (or `MAKEFUN_OUTPUT_DIR`,
+  or the path in `argv[1]`). Errors go to stderr with exit 1.
+- `img_part1/2/3.py` rewritten from the same final poster
+  (`entry-1024-v2.1.png`, unchanged): the finished PNG's base64,
+  split into 3 equal parts (276,012 chars each), one single
+  line per file. They no longer hold the art-piece ZIPs — those
+  were only needed by the old draw-at-runtime design.
+- `build_image.py` is now build-time only: it drew the poster
+  during development and is kept for reference; the entry
+  does not run it. The poster itself is unchanged (same
+  34 stories, same facts).
+
+QA (this session): run exactly as the judging server does, from
+another directory — `python3 -P -s repo/main.py /tmp/fix-test/entry.png`
+— exit 0; two runs byte-identical, sha256
+`fca051e7d4d83207fbeed5156d081713d94b762defc51ffb6281b9a99944cccf`,
+621,025 bytes, 1024×1024. Same result with no argument and
+`MAKEFUN_OUTPUT_DIR` set.
+
 ## v2.1 — bigger pictures, less empty space (Ivan's fix)
 
 Ivan's words: "masih banyak ruang kosong, bisa agak dibesarkan
@@ -209,7 +243,9 @@ Full sourcing, every number, and the excluded-candidate list are in
    the entrypoint. (`main.py` was written from scratch by a
    fresh agent that had never seen a previous `main.py`, and
    verified to reproduce the v2 poster byte-for-byte; the
-   checker rejects copied/re-typed `main.py`.)
+   checker rejects copied/re-typed `main.py`.) Superseded by the
+   v2.1 fix above — the entry no longer draws at runtime; it
+   decodes the finished poster.
 2. **No palette quantize:** full RGB, `optimize=True` (quantize
    made the 18 Nov v3 poster blurry).
 3. **Art embedding:** base64 stored as one single line per
@@ -296,11 +332,13 @@ Full sourcing, every number, and the excluded-candidate list are in
 
 ## Files
 
-- `build_image.py` — draws the poster (run:
-  `python3 build_image.py [output.png]`, default
-  `/output/entry.png`). `main.py` — the entrypoint, written
-  from scratch by a fresh agent (see deviation 1 above).
-- `img_part1.py`, `img_part2.py`, `img_part3.py` — embedded
-  artwork (base64 ZIPs, one line each).
+- `main.py` — the entrypoint: decodes the finished poster from
+  `img_part1/2/3.py` and writes it (run:
+  `python3 main.py [output.png]`, default `/output/entry.png`).
+  Written from scratch by a fresh agent (see deviation 1 above).
+  `build_image.py` — drew the poster during development
+  (Pillow); kept for reference, not run by the entry.
+- `img_part1.py`, `img_part2.py`, `img_part3.py` — the finished
+  poster as base64, split in 3 equal parts, one line each.
 - `facts.md` — story list, sources, number table, exclusions.
 - `README.md`, `LICENSE` (MIT), `.makefun/owner.json`.
