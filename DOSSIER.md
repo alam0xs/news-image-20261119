@@ -343,6 +343,90 @@ Full sourcing, every number, and the excluded-candidate list are in
 - `facts.md` — story list, sources, number table, exclusions.
 - `README.md`, `LICENSE` (MIT), `.makefun/owner.json`.
 
+## v4 — rank-2 layout revision (Ivan's fix, 2026-11-20)
+
+Ivan's words: "Revisi border nya kaya gini loh, samain saja tata
+letak nya tapi tidak gambar dan map nya" — copy the rank-2
+poster's borders and layout, but NOT its pictures or its map.
+Reference: `chatgpt-images/rank2-poster.webp` (19 stories).
+
+**What changed vs v3 (layout + borders ONLY):**
+
+- **Every card is now inside a thin 1 px ink BOX** — the rank-2
+  look: the picture fills the top of the box edge to edge, then
+  the red circled number + place/category chip, the black serif
+  headline, and the 2–3 line dark description, all inside the
+  box, with a small cream gap between neighbouring boxes.
+  (v3 had no card borders at all — hairline rules only. v2.1 had
+  3 px outlines + 2 px art frames. v4 is the middle ground the
+  rank-2 poster shows: exactly 1 px.)
+- The overall arrangement follows rank 2: masthead + strapline +
+  six-column number band; 3 hero boxes; 5×2 mid boxes; map left +
+  "ALSO ON THURSDAY 19 NOVEMBER" briefs right; DATE CHECK box at
+  the bottom.
+- **Number band unchanged:** the same six VERIFIED figures
+  ($81.3bn, 13 years, 11:00 UTC, 200,000+, 120–130 km/h, 2019)
+  in navy on cream — NOT red, as the rank-2 poster has them.
+
+**What did NOT change:**
+
+- **Illustrations: v3's own panels** (h1–h3, m1–m10) — the
+  rank-2 poster's pictures were NOT used. Hero art 318×100,
+  mid art 190×52 (same crops as v3, resized).
+- **Map: v3's light map** — NOT the rank-2 poster's dark navy
+  map. Same 13 pins, same positions (re-checked distinct at 2×
+  zoom: US east-coast cluster 3/11/9 and Europe cluster 4/6/7/10
+  are tight but separate).
+- **Stories, facts, numbers: identical to v3** — same 34 stories
+  (3 hero + 10 mid + 21 briefs), same headlines, same
+  descriptions, same ICJ verdict wording. No rank-2-only story
+  or figure was used (Suneung 551,864; Colombia unions strike;
+  Australia jobless; Gaza tanks; "700,000+ Rohingya"; "$120bn
+  COP31"; "50,000 moved to safety") — all still unverified.
+
+**Build notes:**
+
+- `build_image.py` was written fresh for the v4 layout (Pillow,
+  build-time only). It reads the v3 art ZIP from
+  `img_part1/2/3.py` — the art parts were restored from
+  `../v3-art-parts-backup/` before building (the v3 poster parts
+  are backed up in `../v3-poster-parts-backup/`). Packing script:
+  `../pack_poster_v4.py`.
+- First render overflowed the page by 17 px (page_bottom 1035);
+  fixed by tightening gaps, not by shrinking the art: brief
+  leading 14→13, section gap 6→4, hero→mid gap 7→6, mid row gap
+  4→3, art→chip gap 6→5, card bottom pads 7→6 / 6→5. Final
+  layout: hero_h=277, mid_h=172, page_bottom 1014, no warning.
+- `main.py` UNTOUCHED (47-line stdlib-only decoder, same as the
+  v2.1 fix). `img_part1/2/3.py` now hold the final v4 poster
+  base64, 3 equal parts (250,532 chars each), one single line
+  each.
+
+**QA (this session):** run exactly as the judging server does,
+from another directory — `python3 -P -s repo/main.py
+/tmp/v4-test/entry.png` — exit 0; two runs byte-identical, sha256
+`3d93c566e4126e4ff8323731b8c6c8b180d96a66c80d9a753095e9b427f13510`,
+563,695 bytes, 1024×1024 (≤1 MiB). Output matches the displayed
+poster byte-for-byte. Visual QA at full size, 2× zoom (map pins,
+hero card, mid cards) and 300 px downscale: all 13 boxes have a
+uniform 1 px border, no text collisions, all descriptions
+readable, all 13 map pins distinct, every number matches
+`facts.md`.
+
+**Remaining weaknesses:**
+
+- Art is the same v3 art: M6 (COP31) still abstract (bar-chart
+  panel); M12 (Riyadh/Hormuz) radar arc mostly cropped; H1
+  slightly squashed vertically (same as v3); H3's chart generic
+  (no "ANT" ticker inside the image).
+- The map is small (280×120); the US east-coast pins (3/11/9)
+  and Europe pins (4/6/7/10) are distinct but dense at a glance.
+- Briefs are mostly single-source aggregator listings; Africa
+  still thin (Ruto + Nairobi forum only).
+- The 1 px boxes make the page denser than v3's open layout —
+  that is exactly what Ivan asked for (match rank 2), but the
+  cream breathing room v3 had is reduced.
+
 ## v3 — rank-2 style revision (Ivan's fix, 2026-11-20)
 
 Ivan's words: "Promp baru untuk revisi yang 19 november itu, tolong

@@ -58,11 +58,11 @@ python3 main.py out.png    # writes out.png instead
 ```
 
 Two runs produce byte-identical output (verified). The poster is
-1024×1024, 555,859 bytes (under the 1 MiB limit), sha256
-`015afd6548a307ca821007e212f1f530c2c0a7ce1168a7cde61927ff121d2fcc`
-(v3 — rank-2 style revision: thin hairlines instead of thick
-borders, real descriptions on every card, all-new flat editorial
-illustrations, confirmed ICJ verdict wording; see `DOSSIER.md`).
+1024×1024, 563,695 bytes (under the 1 MiB limit), sha256
+`3d93c566e4126e4ff8323731b8c6c8b180d96a66c80d9a753095e9b427f13510`
+(v4 — rank-2 layout revision: every card inside a thin 1 px ink
+box, exactly like the rank-2 poster, with v3's own illustrations
+and light map kept; see `DOSSIER.md`).
 
 `main.py` was written from scratch by a fresh agent that had
 never seen a previous `main.py`, to keep the run record clean.

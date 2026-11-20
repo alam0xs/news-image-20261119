@@ -1,33 +1,47 @@
 #!/usr/bin/env python3
-"""Draw the news-image-20261119 v3 poster (1024x1024, RGB PNG).
+"""Draw the news-image-20261119 v4 poster (1024x1024, RGB PNG).
 
-v3 = master-prompt-v3 (rank-2 style). The main correction from v2.1:
-  - NO thick card borders (v2.1 had 3 px outlines + 2 px art frames).
-  - NO red verified-number strips under articles.
-  - NO region band.
-  - Only hairline 1-2 px rules between articles; illustrations sit
-    directly in the article area with no frame; generous cream space.
-  - Every card has a real 2-4 line dark description (never red).
-  - Masthead like rank 2: "THE WORLD IN ONE PICTURE" + huge serif
-    date + italic red strapline + six-column number band on cream.
-  - 3 heroes + 10 mids + 21 briefs = 34 stories, map + DATE CHECK.
+v4 = v3's stories, facts, art and masthead, re-laid-out the way Ivan
+asked: "Revisi border nya kaya gini loh, samain saja tata letak nya
+tapi tidak gambar dan map nya" -- copy the rank-2 poster's layout
+and borders, but keep OUR pictures and OUR map.
 
-Stories: master-prompt-v3 + facts-v2-verified.md. M4 uses VERDICT
-wording -- the ICJ judgment was confirmed at build time (UN News,
-Reuters, CNN, Le Monde, 19 Nov): Myanmar found responsible for
-genocide against the Rohingya, first time the Court held a state
-accountable, ruling final. M13 is Ruto (verified v2 Africa slot).
-Numbers printed: $81.3bn, 13 years, 11:00 UTC, 200,000+, 120-130
-km/h, 2019 -- all from the master prompt / verified facts. The
-rank-2 poster's conflicting figures were NOT copied ($120bn COP31,
-700,000+ Rohingya, 50,000 Odisha, 551,864 Suneung).
+What changes vs v3:
+  - Every one of the 13 cards (3 heroes + 10 mids) now sits inside a
+    thin 1 px ink BOX, exactly like the rank-2 poster: the picture
+    fills the top of the box edge to edge, then the red circled
+    number + place/category chip, the black serif headline, and the
+    2-3 line dark description, all inside the box, with a small
+    cream gap between neighbouring boxes. (v3 had no card borders
+    at all -- hairline rules only. v2.1 had 3 px outlines + 2 px art
+    frames, which Ivan first asked for and then asked to remove.
+    v4 is the middle ground the rank-2 poster shows: 1 px.)
+  - Nothing else moves: same masthead ("THE WORLD IN ONE PICTURE"
+    + big serif date + italic red strapline), same six-column number
+    band with the same six VERIFIED navy figures ($81.3bn, 13 years,
+    11:00 UTC, 200,000+, 120-130 km/h, 2019), same light world map
+    with the same 13 pins, same 21 briefs, same DATE CHECK box.
 
-Art: 13 NEW flat editorial vector illustrations + new world map,
-generated as 4 contact sheets (v3-illustrations/) in one consistent
-style, cropped by prepare_art_v3.py into the embedded ZIP in
-img_part1/2/3.py (single-line base64). The build is fully
-deterministic: same bytes on every run, no network, no clock, no
-randomness.
+What does NOT change (all carried over from v3 untouched):
+  - The 13 illustrations: the v3 flat-editorial panels (h1-h3,
+    m1-m10) -- NOT the rank-2 poster's pictures.
+  - The map: v3's light map -- NOT the rank-2 poster's dark navy map.
+  - The 34 stories and every number: 3 heroes + 10 mids + 21 briefs,
+    all verified in facts.md. The rank-2-only stories/figures
+    (Suneung 551,864; Colombia unions strike; Australia jobless;
+    Gaza tanks; "700,000+ Rohingya"; "$120bn COP31"; "50,000 moved
+    to safety") stay OFF the poster -- they failed verification.
+  - The ICJ verdict wording stays: the Court found Myanmar guilty
+    of genocide against the Rohingya on Thursday 19 Nov; the ruling
+    is final (UN News, Reuters, CNN, Le Monde).
+
+Art: the v3 art ZIP (h1-h3, m1-m10, map) is embedded in
+img_part1/2/3.py as single-line base64 while building; after the
+final poster is packed into those same files, re-rendering needs
+the art parts restored from ../v3-art-parts-backup/.
+
+The build is fully deterministic: same bytes on every run, no
+network, no clock, no randomness.
 
 Usage: python3 build_image.py [out_path]  (default /output/entry.png)
 """
@@ -51,40 +65,35 @@ RULE = (43, 43, 43)
 NAVY = (18, 35, 74)
 RED = (179, 38, 30)
 GREY = (90, 86, 78)
-LIGHT_GREY = (150, 146, 138)
-REGION = {
-    "Europe": (46, 94, 170),
-    "Americas": (46, 125, 79),
-    "Asia-Pacific": (200, 69, 45),
-    "Middle East": (199, 122, 31),
-    "Africa": (138, 106, 16),
-    "Oceania": (122, 63, 160),
-    "World": (74, 85, 96),
-}
+FAINT = (150, 146, 138)
 
-# ---- v3 geometry ----
+# ---- v4 geometry ----
 TOP_Y = 8
 DATE_Y = 26
 DATE_MAX = 60
 STRAP_Y = 96
-BAND_RULE_Y = 116
+BAND_TOP_RULE = 116
 BAND_Y = 118
 BAND_H = 36
-BAND_RULE2_Y = 158
+BAND_BOTTOM_RULE = 158
 HERO_Y = 166
 HERO_W = 320
 HERO_GAP = 8
-HERO_ART_W, HERO_ART_H = 308, 104
+HERO_ART_W, HERO_ART_H = 318, 100
+HERO_MID_GAP = 6
 MID_W = 192
-MID_CGAP = 4
-MID_RGAP = 3
-MID_ART_W, MID_ART_H = 180, 54
+MID_COL_GAP = 4
+MID_ROW_GAP = 3
+MID_ART_W, MID_ART_H = 190, 52
+SECTION_GAP = 4
 MAP_W, MAP_H = 280, 120
 MAP_COL_W = 330
+CARD_PAD = 7          # text inset from the box edge
+BOX_BORDER = 1        # the rank-2 thin box border
 
 
 # ---- fonts ----
-def _pick(names):
+def _find_font(names):
     for name in names:
         for root in ("/usr/share/fonts", "/usr/local/share/fonts"):
             hits = sorted(Path(root).rglob(name))
@@ -93,33 +102,37 @@ def _pick(names):
     return None
 
 
-SERIF_B = _pick(["NotoSerifCondensed-Bold.ttf", "NotoSerif-Bold.ttf",
-                 "DejaVuSerif-Bold.ttf", "LiberationSerif-Bold.ttf"])
-SERIF = _pick(["NotoSerifCondensed-Regular.ttf", "NotoSerif-Regular.ttf",
-               "DejaVuSerif.ttf", "LiberationSerif-Regular.ttf"])
-SERIF_I = _pick(["NotoSerifCondensed-Italic.ttf", "NotoSerif-Italic.ttf",
-                 "DejaVuSerif-Italic.ttf", "LiberationSerif-Italic.ttf"])
-SANS_B = _pick(["NotoSans-Bold.ttf", "DejaVuSans-Bold.ttf",
-                "LiberationSans-Bold.ttf"])
-SANS = _pick(["NotoSans-Regular.ttf", "DejaVuSans.ttf",
-              "LiberationSans-Regular.ttf"])
+SERIF_BOLD = _find_font(["NotoSerifCondensed-Bold.ttf",
+                         "NotoSerif-Bold.ttf", "DejaVuSerif-Bold.ttf",
+                         "LiberationSerif-Bold.ttf"])
+SERIF_REG = _find_font(["NotoSerifCondensed-Regular.ttf",
+                        "NotoSerif-Regular.ttf", "DejaVuSerif.ttf",
+                        "LiberationSerif-Regular.ttf"])
+SERIF_ITALIC = _find_font(["NotoSerifCondensed-Italic.ttf",
+                           "NotoSerif-Italic.ttf",
+                           "DejaVuSerif-Italic.ttf",
+                           "LiberationSerif-Italic.ttf"])
+SANS_BOLD = _find_font(["NotoSans-Bold.ttf", "DejaVuSans-Bold.ttf",
+                        "LiberationSans-Bold.ttf"])
+SANS_REG = _find_font(["NotoSans-Regular.ttf", "DejaVuSans.ttf",
+                       "LiberationSans-Regular.ttf"])
 
 
-def font(path, size):
+def at(path, size):
     return ImageFont.truetype(path, size)
 
 
-def text_w(draw, text, fnt):
+def width_of(draw, text, fnt):
     return draw.textlength(text, font=fnt)
 
 
-def wrap(draw, text, fnt, max_w):
-    """Greedy word wrap; returns a list of lines that fit max_w."""
+def wrap_text(draw, text, fnt, max_w):
+    """Greedy word wrap; returns the lines that fit inside max_w."""
     words = text.split()
     lines, cur = [], ""
     for word in words:
         trial = f"{cur} {word}".strip()
-        if text_w(draw, trial, fnt) <= max_w or not cur:
+        if width_of(draw, trial, fnt) <= max_w or not cur:
             cur = trial
         else:
             lines.append(cur)
@@ -129,17 +142,16 @@ def wrap(draw, text, fnt, max_w):
     return lines
 
 
-def fit_font(draw, text, path, start_size, max_w, min_size=10):
-    """Largest size <= start_size at which text fits max_w."""
-    size = start_size
-    while size > min_size and text_w(draw, text, font(path, size)) > max_w:
+def biggest_fitting(draw, text, path, start, max_w, floor=10):
+    """Largest size <= start at which the text fits inside max_w."""
+    size = start
+    while size > floor and width_of(draw, text, at(path, size)) > max_w:
         size -= 1
-    return font(path, size)
+    return at(path, size)
 
-
-# ---- story data ----
-# "pin" is (fx, fy) on the map image, 0..1 (estimated from the v3 map
-# crop; verified visually on the render).
+# ---- story data (identical to v3; every fact verified in facts.md) ----
+# "pin" is (fx, fy) on the map image, 0..1 (v3 positions, visually
+# verified distinct at 3x zoom).
 HEROES = [
     dict(n=1, place="SHENZHEN, CHINA", cat="DIPLOMACY",
          region="Asia-Pacific", art="h1",
@@ -269,9 +281,10 @@ DATE_CHECK = ("DATE CHECK — left off on purpose because they broke "
 FOOTER = ("Every story on this page happened or was first reported on "
           "Thursday 19 November 2026, in any time zone.")
 
-
 # ---- artwork ----
 def load_art():
+    """Decode the embedded art ZIP (h1-h3, m1-m10, map) from the
+    single-line base64 DATA in img_part1/2/3.py."""
     art = {}
     for part in (1, 2, 3):
         src = (HERE / f"img_part{part}.py").read_text()
@@ -279,69 +292,78 @@ def load_art():
         exec(compile(src, f"img_part{part}.py", "exec"), ns)
         zf = zipfile.ZipFile(io.BytesIO(base64.b64decode(ns["DATA"])))
         for name in zf.namelist():
-            art[name[:-4]] = Image.open(io.BytesIO(zf.read(name))).convert("RGB")
+            art[name[:-4]] = Image.open(
+                io.BytesIO(zf.read(name))).convert("RGB")
     return art
 
 
-# ---- drawing ----
+# ---- card drawing ----
 def draw_chip(d, x, y, n, label, size):
     """Red circled number + red caps label (rank-2 style)."""
     r = 7 if size >= 11 else 6
     cx, cy = x + r, y + r
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=RED)
-    num_f = font(SANS_B, 9 if size >= 11 else 8)
+    num_f = at(SANS_BOLD, 9 if size >= 11 else 8)
     t = str(n)
-    d.text((cx - text_w(d, t, num_f) / 2, cy - 6),
+    d.text((cx - width_of(d, t, num_f) / 2, cy - 6),
            t, font=num_f, fill=(255, 255, 255))
-    lab_f = font(SANS_B, size)
+    lab_f = at(SANS_BOLD, size)
     d.text((x + 2 * r + 5, y + (2 * r - size) // 2 + 1),
            label, font=lab_f, fill=RED)
 
 
-def article_height(d, story, w, hero):
-    """Height of one article (art + chip + headline + desc)."""
-    tw = w - 12
-    head_f = font(SERIF_B, 24 if hero else 14)
-    head_lh = 28 if hero else 17
-    head_lines = wrap(d, story["head"], head_f, tw)
-    desc_f = font(SANS, 12 if hero else 11)
-    desc_lh = 15 if hero else 13
-    desc_lines = wrap(d, story["desc"], desc_f, tw)
+def card_text_lines(d, story, w, hero):
+    """Wrapped headline + description lines for one card."""
+    tw = w - 2 * CARD_PAD
+    head_f = at(SERIF_BOLD, 24 if hero else 14)
+    desc_f = at(SANS_REG, 12 if hero else 11)
+    return (wrap_text(d, story["head"], head_f, tw),
+            wrap_text(d, story["desc"], desc_f, tw))
+
+
+def card_height(d, story, w, hero):
+    """Full box height: border + art + chip + headline + desc + pad."""
+    head_lines, desc_lines = card_text_lines(d, story, w, hero)
     art_h = HERO_ART_H if hero else MID_ART_H
     chip_h = 14 if hero else 12
-    return (art_h + 5 + chip_h + 3 + len(head_lines) * head_lh
-            + 3 + len(desc_lines) * desc_lh + 6), head_lines, desc_lines
+    head_lh = 28 if hero else 17
+    desc_lh = 15 if hero else 13
+    bottom_pad = 6 if hero else 5
+    return (2 * BOX_BORDER + art_h + 5 + chip_h + 3
+            + len(head_lines) * head_lh + 3
+            + len(desc_lines) * desc_lh + bottom_pad)
 
 
-def draw_article(d, page, art, story, x, y, w, hero):
-    """One article: art on top (NO frame), chip, headline, desc."""
+def draw_card(d, page, art, story, x, y, w, h, hero):
+    """One boxed card: 1 px ink border, picture across the top of the
+    box, then chip, headline and description inside the box."""
+    d.rectangle([x, y, x + w - 1, y + h - 1], outline=INK,
+                width=BOX_BORDER)
     aw = HERO_ART_W if hero else MID_ART_W
     ah = HERO_ART_H if hero else MID_ART_H
-    ax = x + 6
     img = art[story["art"]]
     if img.size != (aw, ah):
         img = img.resize((aw, ah), Image.LANCZOS)
-    page.paste(img, (ax, y))
-    cy = y + ah + 5
+    page.paste(img, (x + BOX_BORDER, y + BOX_BORDER))
+    cy = y + BOX_BORDER + ah + 5
     chip_size = 11 if hero else 9
-    draw_chip(d, x + 6, cy, story["n"],
+    draw_chip(d, x + CARD_PAD, cy, story["n"],
               f"{story['place']} · {story['cat']}", chip_size)
     hy = cy + (14 if hero else 12) + 3
-    tw = w - 12
-    head_f = font(SERIF_B, 24 if hero else 14)
+    tx = x + CARD_PAD
+    head_f = at(SERIF_BOLD, 24 if hero else 14)
     head_lh = 28 if hero else 17
-    head_lines = wrap(d, story["head"], head_f, tw)
+    head_lines, desc_lines = card_text_lines(d, story, w, hero)
     for line in head_lines:
-        d.text((x + 6, hy), line, font=head_f, fill=INK)
+        d.text((tx, hy), line, font=head_f, fill=INK)
         hy += head_lh
-    desc_f = font(SANS, 12 if hero else 11)
+    desc_f = at(SANS_REG, 12 if hero else 11)
     desc_lh = 15 if hero else 13
     hy += 3
-    for line in wrap(d, story["desc"], desc_f, tw):
-        d.text((x + 6, hy), line, font=desc_f, fill=INK)
+    for line in desc_lines:
+        d.text((tx, hy), line, font=desc_f, fill=INK)
         hy += desc_lh
     return hy
-
 
 def build(out_path):
     art = load_art()
@@ -352,82 +374,72 @@ def build(out_path):
     d.rectangle([5, 5, PAGE_W - 6, PAGE_H - 6], outline=RULE, width=1)
 
     # ---- masthead top line (rank-2 style) ----
-    top_f = font(SANS_B, 11)
+    top_f = at(SANS_BOLD, 11)
     d.text((MARGIN, TOP_Y), "THE WORLD IN ONE PICTURE",
            font=top_f, fill=RED)
     total = len(HEROES) + len(MIDS) + len(BRIEFS)
     right_txt = f"{total} STORIES · EVERY ONE FROM THURSDAY 19 NOVEMBER 2026"
-    d.text((PAGE_W - MARGIN - text_w(d, right_txt, top_f), TOP_Y),
+    d.text((PAGE_W - MARGIN - width_of(d, right_txt, top_f), TOP_Y),
            right_txt, font=top_f, fill=GREY)
 
     # ---- big serif date, auto-fitted ----
     date_txt = "Thursday 19 November 2026"
-    date_f = fit_font(d, date_txt, SERIF_B, DATE_MAX, CONTENT_W)
-    d.text(((PAGE_W - text_w(d, date_txt, date_f)) / 2, DATE_Y),
+    date_f = biggest_fitting(d, date_txt, SERIF_BOLD, DATE_MAX, CONTENT_W)
+    d.text(((PAGE_W - width_of(d, date_txt, date_f)) / 2, DATE_Y),
            date_txt, font=date_f, fill=INK)
 
     # ---- italic red strapline ----
     strap = ("Three leaders meet in Shenzhen · GTA VI unlocks worldwide "
              "· A record IPO starts trading · The World Court rules on "
              "the Rohingya")
-    strap_f = font(SERIF_I, 13)
-    d.text(((PAGE_W - text_w(d, strap, strap_f)) / 2, STRAP_Y),
+    strap_f = at(SERIF_ITALIC, 13)
+    d.text(((PAGE_W - width_of(d, strap, strap_f)) / 2, STRAP_Y),
            strap, font=strap_f, fill=RED)
 
     # ---- number band: navy figures on cream, thin dividers ----
-    d.line([(MARGIN, BAND_RULE_Y), (PAGE_W - MARGIN, BAND_RULE_Y)],
+    d.line([(MARGIN, BAND_TOP_RULE), (PAGE_W - MARGIN, BAND_TOP_RULE)],
            fill=RULE, width=1)
     cell_w = CONTENT_W / len(NUMBER_BAND)
-    num_f = font(SANS_B, 19)
-    num_lab_f = font(SANS, 9)
+    num_f = at(SANS_BOLD, 19)
+    num_lab_f = at(SANS_REG, 9)
     for i, (num, lab) in enumerate(NUMBER_BAND):
         cx = MARGIN + i * cell_w
-        d.text((cx + (cell_w - text_w(d, num, num_f)) / 2, BAND_Y + 3),
+        d.text((cx + (cell_w - width_of(d, num, num_f)) / 2, BAND_Y + 3),
                num, font=num_f, fill=NAVY)
-        d.text((cx + (cell_w - text_w(d, lab, num_lab_f)) / 2, BAND_Y + 25),
-               lab, font=num_lab_f, fill=GREY)
+        d.text((cx + (cell_w - width_of(d, lab, num_lab_f)) / 2,
+                BAND_Y + 25), lab, font=num_lab_f, fill=GREY)
         if i:
             d.line([(cx, BAND_Y + 4), (cx, BAND_Y + BAND_H - 4)],
-                   fill=LIGHT_GREY, width=1)
-    d.line([(MARGIN, BAND_RULE2_Y), (PAGE_W - MARGIN, BAND_RULE2_Y)],
+                   fill=FAINT, width=1)
+    d.line([(MARGIN, BAND_BOTTOM_RULE), (PAGE_W - MARGIN, BAND_BOTTOM_RULE)],
            fill=RULE, width=2)
-    d.line([(MARGIN, BAND_RULE2_Y + 3), (PAGE_W - MARGIN, BAND_RULE2_Y + 3)],
+    d.line([(MARGIN, BAND_BOTTOM_RULE + 3),
+            (PAGE_W - MARGIN, BAND_BOTTOM_RULE + 3)],
            fill=RULE, width=1)
 
-    # ---- heroes: measure, then draw (art top, no frames) ----
-    hero_h = max(article_height(d, s, HERO_W, True)[0] for s in HEROES)
+    # ---- heroes: three equal boxes in a row ----
+    hero_h = max(card_height(d, s, HERO_W, True) for s in HEROES)
     for i, story in enumerate(HEROES):
         hx = MARGIN + i * (HERO_W + HERO_GAP)
-        draw_article(d, page, art, story, hx, HERO_Y, HERO_W, True)
-        if i:
-            gx = MARGIN + i * (HERO_W + HERO_GAP) - HERO_GAP // 2
-            d.line([(gx, HERO_Y), (gx, HERO_Y + hero_h)],
-                   fill=LIGHT_GREY, width=1)
+        draw_card(d, page, art, story, hx, HERO_Y, HERO_W, hero_h, True)
     hero_end = HERO_Y + hero_h
-    d.line([(MARGIN, hero_end + 4), (PAGE_W - MARGIN, hero_end + 4)],
-           fill=RULE, width=1)
 
-    # ---- mids, 5 x 2 ----
-    mid_h = max(article_height(d, s, MID_W, False)[0] for s in MIDS)
-    mid_y0 = hero_end + 9
+    # ---- mids: 5 x 2 equal boxes ----
+    mid_h = max(card_height(d, s, MID_W, False) for s in MIDS)
+    mid_y0 = hero_end + HERO_MID_GAP
     for i, story in enumerate(MIDS):
         row, col = divmod(i, 5)
-        mx = MARGIN + col * (MID_W + MID_CGAP)
-        my = mid_y0 + row * (mid_h + MID_RGAP)
-        draw_article(d, page, art, story, mx, my, MID_W, False)
-        if col:
-            gx = MARGIN + col * (MID_W + MID_CGAP) - MID_CGAP // 2
-            d.line([(gx, my), (gx, my + mid_h)], fill=LIGHT_GREY, width=1)
-    mid_end = mid_y0 + 2 * mid_h + MID_RGAP
-    d.line([(MARGIN, mid_end + 4), (PAGE_W - MARGIN, mid_end + 4)],
-           fill=RULE, width=1)
+        mx = MARGIN + col * (MID_W + MID_COL_GAP)
+        my = mid_y0 + row * (mid_h + MID_ROW_GAP)
+        draw_card(d, page, art, story, mx, my, MID_W, mid_h, False)
+    mid_end = mid_y0 + 2 * mid_h + MID_ROW_GAP
 
     # ---- map + briefs ----
-    sec_y = mid_end + 7
-    sec_f = font(SANS_B, 12)
+    sec_y = mid_end + SECTION_GAP
+    sec_f = at(SANS_BOLD, 12)
     d.text((MARGIN, sec_y), "WHERE IT HAPPENED", font=sec_f, fill=INK)
     d.text((MARGIN + 176, sec_y), "NUMBERED = CARDS · DOTS = BRIEFS",
-           font=font(SANS_B, 9), fill=GREY)
+           font=at(SANS_BOLD, 9), fill=GREY)
     bx0 = MARGIN + 350
     d.text((bx0, sec_y), "ALSO ON THURSDAY 19 NOVEMBER", font=sec_f,
            fill=INK)
@@ -447,10 +459,10 @@ def build(out_path):
         r = 8
         d.ellipse([px - r, py - r, px + r, py + r],
                   fill=(255, 255, 255), outline=RED, width=2)
-        num_f = font(SANS_B, 10)
+        pin_f = at(SANS_BOLD, 10)
         t = str(story["n"])
-        d.text((px - text_w(d, t, num_f) / 2, py - 6),
-               t, font=num_f, fill=RED)
+        d.text((px - width_of(d, t, pin_f) / 2, py - 6),
+               t, font=pin_f, fill=RED)
     # legend: pin counts only, one line, computed from the pin data
     pin_counts = {}
     for s in HEROES + MIDS:
@@ -462,37 +474,37 @@ def build(out_path):
              "Africa": "AFRICA", "World": "WORLD"}
     leg = " · ".join(f"{short[r]} {pin_counts.get(r, 0)}" for r in order)
     leg_y = map_y + MAP_H + 5
-    d.text((MARGIN, leg_y), leg, font=font(SANS_B, 9), fill=INK)
+    d.text((MARGIN, leg_y), leg, font=at(SANS_BOLD, 9), fill=INK)
 
     # briefs, two columns
     bw = 305
     col1 = BRIEFS[:11]
     col2 = BRIEFS[11:]
-    brief_f = font(SANS, 11)
+    brief_f = at(SANS_REG, 11)
     for col_i, col in enumerate((col1, col2)):
         cx = bx0 + col_i * (bw + 20)
         cy = sec_y + 23
         for n, place, text, _region in col:
             line = f"{n} — {place}: {text}"
             fnt = brief_f
-            while text_w(d, line, fnt) > bw and fnt.size > 9:
-                fnt = font(SANS, fnt.size - 1)
+            while width_of(d, line, fnt) > bw and fnt.size > 9:
+                fnt = at(SANS_REG, fnt.size - 1)
             d.text((cx, cy), "•  " + line, font=fnt, fill=INK)
-            cy += 14
-    brief_end = sec_y + 23 + 11 * 15
+            cy += 13
+    brief_end = sec_y + 23 + 11 * 13
 
     # ---- date check + footer ----
     dc_y = max(leg_y + 16, brief_end + 4)
-    dc_lines = wrap(d, DATE_CHECK, font(SANS_B, 9), CONTENT_W - 12)
+    dc_lines = wrap_text(d, DATE_CHECK, at(SANS_BOLD, 9), CONTENT_W - 12)
     dc_h = 4 + len(dc_lines) * 12 + 3
     d.rectangle([MARGIN, dc_y, PAGE_W - MARGIN - 1, dc_y + dc_h - 1],
                 outline=RED, width=1)
     for i, line in enumerate(dc_lines):
         d.text((MARGIN + 6, dc_y + 4 + i * 12), line,
-               font=font(SANS_B, 9), fill=RED)
-    foot_f = font(SANS, 9)
+               font=at(SANS_BOLD, 9), fill=RED)
+    foot_f = at(SANS_REG, 9)
     foot_y = dc_y + dc_h + 3
-    d.text(((PAGE_W - text_w(d, FOOTER, foot_f)) / 2, foot_y),
+    d.text(((PAGE_W - width_of(d, FOOTER, foot_f)) / 2, foot_y),
            FOOTER, font=foot_f, fill=GREY)
 
     print(f"layout: hero_h={hero_h} mid_h={mid_h} hero_end={hero_end} "
