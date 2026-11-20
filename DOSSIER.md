@@ -1,4 +1,4 @@
-# DOSSIER.md — news-image-20261119 v2.1
+# DOSSIER.md — news-image-20261119 v3
 
 Entry for make.fun bounty
 [`news-image-20261119`](https://make.fun/bounty/news-image-20261119):
@@ -342,3 +342,112 @@ Full sourcing, every number, and the excluded-candidate list are in
   poster as base64, split in 3 equal parts, one line each.
 - `facts.md` — story list, sources, number table, exclusions.
 - `README.md`, `LICENSE` (MIT), `.makefun/owner.json`.
+
+## v3 — rank-2 style revision (Ivan's fix, 2026-11-20)
+
+Ivan's words: "Promp baru untuk revisi yang 19 november itu, tolong
+rapihkan deskripsi dan foto nya seperti rank 2 itu" — tidy the
+descriptions and photos like the rank-2 poster. Authority for
+layout, style and descriptions: `master-prompt-v3.txt` (workdir);
+the rank-2 poster is style/layout reference ONLY, never a fact
+source. Same 34 stories as v2.1 (3 hero + 10 mid + 21 briefs);
+no new story was added — the rank-2-only stories (Suneung Korea,
+Colombia unions strike, Australia jobless, Gaza tanks) were NOT
+verified to the two-outlet / 19-Nov rule, so none was used.
+
+**What changed vs v2.1 (the big fix):**
+
+- **Thick borders REMOVED.** v2.1's 3 px card outline + 2 px art
+  frame are gone. Articles are now separated only by 1 px light
+  hairline rules between columns and below the hero/mid rows;
+  illustrations sit frameless inside their article area; one thin
+  1 px outer rule at a 5 px inset. Generous cream space, like
+  rank 2.
+- **Masthead rebuilt like rank 2:** red small-caps
+  "THE WORLD IN ONE PICTURE" left, "34 STORIES · EVERY ONE FROM
+  THURSDAY 19 NOVEMBER 2026" right, one-line bold serif date
+  (auto-fit, max 60 px), italic red strapline: "Three leaders meet
+  in Shenzhen · GTA VI unlocks worldwide · A record IPO starts
+  trading · The World Court rules on the Rohingya".
+- **Number band:** same 6 verified numbers ($81.3bn, 13 years,
+  11:00 UTC, 200,000+, 120–130 km/h, 2019) — navy figures on
+  cream with thin dividers, no red band.
+- **Every card now has a real 2–3 line dark description** (never
+  red); the red number strips under articles are gone. Hero
+  descriptions are 3–4 lines at 12 px; mid descriptions are
+  2–3 lines at 11 px (condensed from the prompt's longer drafts
+  so they fit — no fact was dropped, only words).
+- **All-new illustrations** in one consistent flat editorial
+  vector style (4 contact sheets, 16 panels, generated for v3;
+  crops in `v3-illustrations/`, packed by `prepare_art_v3.py`):
+  every one of the 13 cards has its own scene; no text, no real
+  faces, no logos inside the art. Hero art 308×104, mid art
+  180×54, map 280×120.
+- **Map pins fixed:** v3 draft 1 had pin 6 (Antalya) hidden
+  behind pin 7 (Kyiv) and pin 3 (New York) hidden behind pins 11
+  (Washington) / 9 (Florida). All 13 pin positions were re-spread
+  (centres ≥15 px apart, geographically plausible) and re-checked
+  at 3× zoom — every pin is now distinct and readable.
+- **Layout is computed dynamically** (hero/mid heights measured
+  from wrapped text) and fits exactly: page bottom 1018, outer
+  rule at 1018, no overflow warning.
+
+**Fact change vs v2.1 (one): the ICJ verdict is now CONFIRMED.**
+At v3 build time the Court had delivered its judgment on
+Thursday 19 Nov in Gambia v. Myanmar: Myanmar found responsible
+for genocide against the Rohingya — the first time the Court has
+held a state accountable for genocide; the ruling is final and
+cannot be appealed (UN News, Reuters, CNN, Le Monde, 19–20 Nov).
+M4 therefore uses verdict wording: "World Court rules on
+Rohingya genocide case" / "The World Court finds Myanmar guilty
+of genocide against the Rohingya. The ruling is final." The
+700,000 figure is still NOT printed (brief forbids it), and no
+killed-estimate is printed. The v2 brief's swap rule (ICJ becomes
+H3 if the verdict is clear) was NOT applied: the v3 master
+prompt — the authority for this revision — keeps ANT as H3 and
+ICJ as M4, with the verdict in the strapline.
+
+**Numbers rejected from the rank-2 poster (not on this poster):**
+"700,000+ Rohingya" (brief forbids); "$120bn COP31" (16 Nov draft
+proposal — poster says only "a finance target stays in play");
+"50,000 moved to safety in Odisha" (prompt: 200,000+ PLANNED
+evacuations); "551,864 Suneung" (story not verified/used).
+
+**Build notes:**
+
+- `build_image.py` was fully rewritten for the v3 layout (Pillow,
+  build-time only). It reads the v3 art ZIP from
+  `img_part1/2/3.py` — after the final poster was packed into
+  those files, re-rendering needs the art-ZIP parts restored from
+  `../v3-art-parts-backup/` (workdir). Packing script:
+  `../pack_poster_v3.py`.
+- `main.py` UNTOUCHED (47-line stdlib-only decoder, same as the
+  v2.1 fix). `img_part1/2/3.py` now hold the final v3 poster
+  base64, 3 equal parts (247,050 / 247,050 / 247,048 chars), one
+  single line each.
+
+**QA (this session):** run exactly as the judging server does,
+from another directory — `python3 -P -s repo/main.py
+/tmp/v3-test/entry.png` — exit 0; two runs byte-identical, sha256
+`015afd6548a307ca821007e212f1f530c2c0a7ce1168a7cde61927ff121d2fcc`,
+555,859 bytes, 1024×1024 (≤1 MiB). Output matches the displayed
+poster byte-for-byte. Visual QA at full size and at 300 px:
+no text collisions, no thick borders left, all descriptions
+readable, all 13 map pins distinct, every number matches
+`facts.md`.
+
+**Remaining weaknesses:**
+
+- M6 (COP31) art is abstract — a bar-chart panel, not a
+  recognisable conference hall. M12 (Riyadh/Hormuz) art shows a
+  skyline with a radar arc mostly cropped out; the tanker is
+  small. H1 art is slightly squashed vertically (same as v2.1).
+- H3's chart art is clean but generic (no "ANT" ticker inside
+  the image; the ticker lives only in the headline/band).
+- The map is small (280×120) and stylised; the US east-coast
+  pins (3/11/9) and the Europe pins (4/6/7/10) sit close — now
+  distinct, but the clusters are dense at a glance.
+- Briefs are mostly single-source aggregator listings (see
+  `facts.md`); kept to one short line each, no unverified numbers.
+- Africa is still thin: only Ruto (card) + the Nairobi forum
+  (brief) — no verified Africa hero/mid beyond that.

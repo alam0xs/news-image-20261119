@@ -11,17 +11,19 @@ Thursday, 19 November 2026, to `/output/entry.png`.
 
 ## The image
 
-A newspaper front page, "THE WORLD — THURSDAY, 19 NOVEMBER 2026":
-**34 stories across 6 continents** — 3 hero stories, 10 mid stories,
-21 one-line briefs and a numbered world map, each with a region chip
-and a small flat illustration. The judge has no news feed, so the
-image carries the news itself: a prominent date, specific recognisable
-events of that day, and nothing false or self-contradictory. Every
-story was checked against live reporting of 19 November 2026;
-outcomes still pending at build time (the APEC summit, the ICJ
-verdict, Anthropic's first trade) are worded as pending, and numbers
-that differ between sources are left out. Full sourcing in
-`facts.md`.
+A newspaper front page, "THE WORLD IN ONE PICTURE — THURSDAY,
+19 NOVEMBER 2026": **34 stories across 6 continents** — 3 hero
+stories, 10 mid stories, 21 one-line briefs and a numbered world
+map, each with a region chip and a small flat illustration. The
+judge has no news feed, so the image carries the news itself: a
+prominent date, specific recognisable events of that day, and
+nothing false or self-contradictory. Every story was checked
+against live reporting of 19 November 2026; outcomes still
+pending at build time (the APEC summit, Anthropic's first trade)
+are worded as pending, and numbers that differ between sources
+are left out. The ICJ verdict (M4) is confirmed: delivered
+Thursday 19 November, Myanmar found responsible for genocide
+against the Rohingya. Full sourcing in `facts.md`.
 
 - **Hero 1 — Asia-Pacific:** Trump, Xi and Putin hold the first
   three-way summit in Shenzhen (nuclear arms control tops the agenda)
@@ -29,13 +31,15 @@ that differ between sources are left out. Full sourcing in
   Xbox Series X|S; first unlock 11:00 UTC)
 - **Hero 3 — Americas:** Anthropic debuts in the biggest IPO on
   record (priced $83; $81.3bn raised)
-- **Mids:** ICJ reads the Rohingya judgment; Cyclone Akvan bears
-  down on east India; COP31 enters its final 48 hours with 21
-  issues open; Ukraine watches Shenzhen from the sidelines; APEC
-  leaders gather in Shenzhen (Xi pledges $20m); South Florida
-  floods; Israel pauses the E1 settlement contract; lawmakers urge
-  Trump to press Xi on detainees; Trump reportedly weighs new Iran
-  strikes; Ruto's State of the Nation address.
+- **Mids:** World Court rules Myanmar guilty of genocide against
+  the Rohingya (first time the Court has held a state
+  accountable); Cyclone Akvan bears down on east India; COP31
+  enters its final 48 hours with 21 issues open; Ukraine watches
+  Shenzhen from the sidelines; APEC leaders gather in Shenzhen
+  (Xi pledges $20m); South Florida floods; Israel pauses the E1
+  settlement contract; lawmakers urge Trump to press Xi on
+  detainees; Trump reportedly weighs new Iran strikes; Ruto's
+  State of the Nation address.
 
 ## How it works
 
@@ -54,9 +58,11 @@ python3 main.py out.png    # writes out.png instead
 ```
 
 Two runs produce byte-identical output (verified). The poster is
-1024×1024, 621,025 bytes (under the 1 MiB limit), sha256
-`fca051e7d4d83207fbeed5156d081713d94b762defc51ffb6281b9a99944cccf`
-(v2.1 — bigger hero/mid art and map; see `DOSSIER.md`).
+1024×1024, 555,859 bytes (under the 1 MiB limit), sha256
+`015afd6548a307ca821007e212f1f530c2c0a7ce1168a7cde61927ff121d2fcc`
+(v3 — rank-2 style revision: thin hairlines instead of thick
+borders, real descriptions on every card, all-new flat editorial
+illustrations, confirmed ICJ verdict wording; see `DOSSIER.md`).
 
 `main.py` was written from scratch by a fresh agent that had
 never seen a previous `main.py`, to keep the run record clean.

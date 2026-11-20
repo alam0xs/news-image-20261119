@@ -55,13 +55,16 @@ multi-outlet; briefs are mostly single-source aggregator listings.
 
 ## Mids
 
-### M1 — Court reads Rohingya genocide judgment (The Hague)
-- **Poster:** "Court reads Rohingya genocide judgment" / "Gambia
-  v. Myanmar; verdict day in The Hague" / band "CASE FILED NOV
-  2019".
+### M1 — World Court rules on Rohingya genocide case (The Hague)
+- **Poster:** "World Court rules on Rohingya genocide case" /
+  "The World Court finds Myanmar guilty of genocide against the
+  Rohingya. The ruling is final." / band "CASE FILED 2019".
 - **Sources:** brief-claude.txt (reading 10:00 CET 19 Nov; case
-  filed Nov 2019). The verdict itself is worded neutrally ("Court
-  reads ... judgment") — no outcome claimed.
+  filed Nov 2019). **v3 update:** the verdict is now CONFIRMED —
+  delivered Thursday 19 Nov, Myanmar found responsible for
+  genocide against the Rohingya, the first time the Court has held
+  a state accountable for genocide; the ruling is final and cannot
+  be appealed (UN News, Reuters, CNN, Le Monde, 19–20 Nov).
 - **Trap avoided:** the "730,000 Rohingya" figure is NOT printed
   (single source, brief forbids it).
 
